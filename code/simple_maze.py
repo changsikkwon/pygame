@@ -1,10 +1,10 @@
 import tkinter
 import tkinter.messagebox
 
-key = 0
 mx = 1
 my = 1
-yuka = 0
+state = 0
+key = 0
 
 
 def key_down(e):
@@ -17,18 +17,8 @@ def key_up(e):
     key = ""
 
 
-def main_proc():
-    global mx, my, yuka
-
-    if key == "Shift_L" and yuka > 1:
-        canvas.delete("PAINT")
-        mx = 1
-        my = 1
-        yuka = 0
-        for y in range(7):
-            for x in range(10):
-                if maze[y][x] == 2:
-                    maze[y][x] = 0
+def move():
+    global mx, my
 
     if key == "Up" and maze[my - 1][mx] == 0:
         my -= 1
@@ -41,25 +31,77 @@ def main_proc():
 
     if maze[my][mx] == 0:
         maze[my][mx] = 2
-        yuka += 1
-        canvas.create_rectangle(
-            mx * 80, my * 80, mx * 80 + 79, my * 80 + 79, fill="light green", width=0, tag="PAINT"
-        )
-    canvas.delete("mimi")
-    canvas.create_image(mx * 80 + 40, my * 80 + 40, image=img, tag="mimi")
 
-    if yuka == 30:
+        canvas.create_rectangle(
+            mx * 80, my * 80, mx * 80 + 79, my * 80 + 79, fill="pink", width=0, tag="PAINT"
+        )
+    canvas.delete("Winter")
+    canvas.create_image(mx * 80 + 40, my * 80 + 40, image=img, tag="Winter")
+
+
+def count_tile():
+    cnt = 0
+    for i in range(7):
+        for j in range(10):
+            if maze[i][j] == 0:
+                cnt += 1
+    return cnt
+
+
+def check():
+    cnt = count_tile()
+
+    if 0 not in [maze[my - 1][mx], maze[my + 1][mx], maze[my][mx - 1], maze[my][mx + 1]]:
+        return 2
+    elif cnt == 0:
+        return 1
+    else:
+        return 0
+
+
+def reset():
+    global mx, my, state
+    state = 0
+    canvas.delete("PAINT")
+    mx = 1
+    my = 1
+    for i in range(7):
+        for j in range(10):
+            if maze[i][j] == 2:
+                maze[i][j] = 0
+
+
+def main_proc():
+    global mx, my, state, key
+    if key == "Escape":
+        key = 0
+        ret = tkinter.messagebox.askyesno("Quit", "Quit?")
+        if ret:
+            root.destroy()
+            return
+    if key == "Shift_L":
+        reset()
+
+    state = check()
+
+    if state == 0:
+        move()
+    if state == 1:
         canvas.update()
         tkinter.messagebox.showinfo("Clear!", "Clear!")
-    else:
-        root.after(200, main_proc)
+        reset()
+    if state == 2:
+        tkinter.messagebox.showinfo("Fail!", "Fail!")
+        reset()
+
+    root.after(100, main_proc)
 
 
 root = tkinter.Tk()
 root.title("Maze Game")
 root.bind("<KeyPress>", key_down)
 root.bind("<KeyRelease>", key_up)
-canvas = tkinter.Canvas(width=800, height=600, bg="white")
+canvas = tkinter.Canvas(width=800, height=560, bg="white")
 canvas.pack()
 
 maze = [
@@ -76,10 +118,10 @@ for i in range(7):
     for j in range(10):
         if maze[i][j] == 1:
             canvas.create_rectangle(
-                j * 80, i * 80, j * 80 + 79, i * 80 + 79, fill="sky blue", width=0
+                j * 80, i * 80, j * 80 + 79, i * 80 + 79, fill="skyblue", width=0
             )
 
 img = tkinter.PhotoImage(file="../media/다운로드.png")
-canvas.create_image(mx * 80 + 40, my * 80 + 40, image=img, tag="mimi")
+canvas.create_image(mx * 80 + 40, my * 80 + 40, image=img, tag="Winter")
 main_proc()
 root.mainloop()
