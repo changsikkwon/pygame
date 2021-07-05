@@ -59,7 +59,7 @@ root = tkinter.Tk()
 root.title("Maze Game")
 root.bind("<KeyPress>", key_down)
 root.bind("<KeyRelease>", key_up)
-canvas = tkinter.Canvas(width=800, height=560, bg="white")
+canvas = tkinter.Canvas(width=800, height=600, bg="white")
 canvas.pack()
 
 maze = [
@@ -72,11 +72,11 @@ maze = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
-for y in range(7):
-    for x in range(10):
-        if maze[y][x] == 1:
+for i in range(7):
+    for j in range(10):
+        if maze[i][j] == 1:
             canvas.create_rectangle(
-                x * 80, y * 80, x * 80 + 79, y * 80 + 79, fill="sky blue", width=0
+                j * 80, i * 80, j * 80 + 79, i * 80 + 79, fill="sky blue", width=0
             )
 
 img = tkinter.PhotoImage(file="../media/다운로드.png")
